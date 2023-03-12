@@ -2,24 +2,58 @@ package main
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"encoding/json"
 	"fmt"
 )
 
+// global conversion buffer for testing
+var stringBuffer bytes.Buffer
+
+// Hash code sha256 for transport validation
+// of stringBuffer
+// It uses a standard seed, this needs to be configurable
+// in a production environmant
+// (we can use the same for encryption, would need a certificate for this, however)
+var testHash [32]byte
+
+const prefixCode = "#S33D"
+
+type Admin struct {
+	ID         int    `json:"id"`
+	ShardID    string `json:"shardID"`
+	VersionID  string `json:"versionID"`
+	ValidFrom  string `json:"validFrom"`
+	OrgName    string `json:"orgName"`
+	DbTypeNAme string `json:"dbTypeName"`
+	Replica    int    `json:"replica"`
+}
+
+// basic main function to run tests one after the other
 func main() {
 
-	fmt.Println("Hello")
+	fmt.Println("Hello to testing")
 
+	// primary mashaling test of simple data types
 	test()
+	// Marshaling test for business documents
+	// (We had called them "Newdocs")
+
+	// Mashaling
 	test01()
+	// Unmarshaling
+	testUM01()
+
+	// database connections
+	// ...
 
 }
 
 func test() {
 	// test 1
-	// create basid marshaling
+	// create basic marshaling
 
-	fmt.Println("Marshal some basid data types")
+	fmt.Println("Marshal some basic data types")
 
 	// Testing some types
 	// Boolean
@@ -34,7 +68,7 @@ func test() {
 	fmt.Println(string(fltB))
 
 	// String
-	strB, _ := json.Marshal("test")
+	strB, _ := json.Marshal("test string")
 	fmt.Printf("string %v \n", string(strB))
 
 	// List
@@ -49,41 +83,37 @@ func test01() {
 	var jsonBlob1 []byte
 	var jsonBlob2 []byte
 
+	// a byte array of a JSON array
+	// we use a basic cluster configuration as an example
+	// (this needs to be the edge points of a swim lane)
 	jsonBlob1 = []byte(`[    
      {  
-        "ID": 1, 
-        "Shard": "0",
-        "Version": "1.0.0.1",
-        "ValidFrom": "2023-03-01",
-        "Organization" : "IT",
-        "Database" : "postgres",
-        "Replica": 3
+        "id": 1, 
+        "shardID": "0",
+        "versionID": "1.0.0.1",
+        "validFrom": "2023-03-01",
+        "orgName" : "IT",
+        "dbTypeName" : "postgres",
+        "replica": 3
      },
      {
-        "ID": 2,
-        "Shard": "100",
-        "Version": "1.0.0.1",
-        "ValidFrom": "2023-03-01",
-        "Organization" : "Sales",
-        "Database" : "postgres",
-        "Replica": 3
+        "id": 2,
+        "shardID": "100",
+        "versionID": "1.0.0.1",
+        "validFrom": "2023-03-01",
+        "orgName" : "Sales",
+        "dbTypeName" : "postgres",
+        "replica": 3
      }
 ]  `)
 
-	type Admin struct {
-		ID           int
-		Shard        int
-		Version      string
-		ValidFrom    string
-		Organization string
-		Database     string
-		Replica      int
-	}
+	// the same as a Go struct
 
+	// initialize the Admin table in GO
 	dat := []Admin{
 		{
 			1,
-			0,
+			"0",
 			"1.0.0.1",
 			"2023-03-01",
 			"IT",
@@ -91,7 +121,7 @@ func test01() {
 			3},
 		{
 			2,
-			100,
+			"100",
 			"1.0.0.1",
 			"2023-03-01",
 			"Sales",
@@ -107,19 +137,28 @@ func test01() {
 		panic("marshal")
 	}
 
-	fmt.Printf("input %v\n", dat)
+	fmt.Printf("input: \n GO table %v\n", dat)
 
 	s := string(jsonBlob2)
 
-	fmt.Printf("output %v\n", s)
+	fmt.Printf("output: \n JSON byte array %v\n", s)
 
 	// remove white space from JSON
 	// we need a bytes.Buffer as intermediate buffer
-	buffer := new(bytes.Buffer)
-	if err := json.Compact(buffer, jsonBlob1); err != nil {
+
+	if err := json.Compact(&stringBuffer, jsonBlob1); err != nil {
 		fmt.Println(err)
 	}
-	fmt.Printf("check %v\n", buffer)
+
+	fmt.Printf("Without white space:\n check %v\n", stringBuffer.String())
+
+	// hash code
+	var str string
+	str = stringBuffer.String() + prefixCode // seed
+
+	hash := sha256.Sum256([]byte(str))
+	fmt.Printf("Hash for %v:\n %x\n", s, hash)
+	testHash = hash
 
 	// map to a generic slice (array)
 	// copy  line by line
@@ -128,7 +167,24 @@ func test01() {
 		anything = append(anything, val)
 	}
 
-	fmt.Printf("anything %v\n", anything)
+	fmt.Printf("Copied to generic slice\n: anything\n %v\n", anything)
+
+}
+
+func testUM01() {
+
+	fmt.Println("unmarshal")
+
+	var dat2 []Admin
+
+	fmt.Printf(" %v\n", stringBuffer.String())
+
+	// JSON and Go types must be compabile !!!
+	// ints and strings ...
+	err := json.Unmarshal(stringBuffer.Bytes(), &dat2)
+	if err != nil {
+		fmt.Println(err)
+	}
 
 }
 
