@@ -5,7 +5,8 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
-        "go-on.com/mixin"
+
+	"go-on.com/mixin"
 )
 
 // global conversion buffer for testing
@@ -45,8 +46,11 @@ func main() {
 	// Unmarshaling
 	testUM01()
 
-        // new mpdule
-        mixin.TestM01()
+	// Initialize Mixin
+	mixin.TestInit()
+
+	// new mpdule
+	mixin.TestM01()
 
 	// database connections
 	// ...

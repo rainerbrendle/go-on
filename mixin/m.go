@@ -58,9 +58,18 @@ type Comp struct {
 	B    B1     `json:"content"`
 }
 
+var a1dat []AdminRequest
+var a2dat []AdminRecord
+
+func TestInit() {
+
+}
+
 func TestM01() {
 	var err error
 	var jsonBlob []byte
+
+	// testing : dynamic creation of composite slice
 
 	// dat1 := []Comp{ "IT","Sales"}}
 	var dat1 []Comp
