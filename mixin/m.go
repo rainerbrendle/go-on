@@ -16,45 +16,46 @@ type Admin struct {
 }
 
 type Request struct {
-	ReceiverID string
-	ActorID    string
-	SequenceID int
-	Epoche     int
-	ActionID   string
-	SenderID   string
+	ReceiverID string `json:"receiverID"`
+	ActorID    string `json:"actorID"`
+	SequenceID int    `json:"sequenceID"`
+	Epoche     int    `json:"epoche"`
+	ActionID   string `json:"actionID"`
+	SenderID   string `json:"senderID"`
 }
 
 type AdminRequest struct {
-	Request Request
-	Admin   Admin
+	Request Request `json:"request"`
+	Admin   Admin   `json:"admin"`
 }
 
 type Record struct {
-	ReceiverID string
-	ActorID    string
-	SequenceID int
-	Epoche     int
-	ActionID   string
-	SenderID   string
+	ReceiverID string `json:"receiverID"`
+	ActorID    string `json:"actorID"`
+	SequenceID int    `json:"sequenceID"`
+	Epoche     int    `json:"epoche"`
+	ActionID   string `json:"actionID"`
+	SenderID   string `json:"senderID"`
 }
 
 type AdminRecord struct {
-	Record Record
-	Admin  Admin
+	Record Record `json:"record"`
+	Admin  Admin  `json:"admin"`
 }
 
 type A1 struct {
-	Astr1 string `json:"receiver"`
-	Astr2 string
+	Astr1 string `json:"actor"`
+	Astr2 string `json:"sequence"`
 }
 
 type B1 struct {
-	ID int
+	ID string `json"node"`
 }
 
 type Comp struct {
-	Astr string `json:"department"`
-	A    A1     `json:"node"`
+	Astr string `json:"action"`
+	A    A1     `json:"message"`
+	B    B1     `json:"content"`
 }
 
 func TestM01() {
@@ -65,9 +66,13 @@ func TestM01() {
 	var dat1 []Comp
 
 	dat1 = make([]Comp, 2)
-	dat1[0].Astr = "IT"
-	dat1[0].A.Astr1 = "101"
-	dat1[1].Astr = "Sales"
+
+	dat1[0].Astr = "create"
+	dat1[0].A.Astr1 = "Control"
+	dat1[1].Astr = "modify"
+	dat1[1].A.Astr1 = "Control"
+	dat1[0].B.ID = "YP"
+	dat1[1].B.ID = "YP"
 
 	jsonBlob, err = json.Marshal(dat1)
 	if err != nil {
@@ -79,3 +84,15 @@ func TestM01() {
 	fmt.Printf(" testM01: %v\n", string(jsonBlob))
 
 }
+
+// we can combine structures into bigger ones
+// We can define
+//
+//   Message
+//   Request
+//   Record
+//   View
+//
+//   base classes and add payload with equal or similiar data
+//
+//   It comes with a price. The base classes are visible.
