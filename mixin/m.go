@@ -93,6 +93,8 @@ func TestInit() {
 	a1buffer.Request = m
 	a1dat[1] = a1buffer
 
+	fmt.Println("Initialize Mixin capable test data")
+
 }
 
 func TestM01() {

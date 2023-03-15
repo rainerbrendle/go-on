@@ -27,14 +27,14 @@ type Admin struct {
 	VersionID  string `json:"versionID"`
 	ValidFrom  string `json:"validFrom"`
 	OrgName    string `json:"orgName"`
-	DbTypeNAme string `json:"dbTypeName"`
+	DbTypeName string `json:"dbTypeName"`
 	Replica    int    `json:"replica"`
 }
 
 // basic main function to run tests one after the other
 func main() {
 
-	fmt.Println("Hello to testing")
+	fmt.Println("Hello to JSON mashaling testing")
 
 	// primary mashaling test of simple data types
 	test()
@@ -53,7 +53,7 @@ func main() {
 	mixin.TestM01()
 
 	// database connections
-	// ...
+        mixin.TestDB()	
 
 }
 
@@ -181,7 +181,7 @@ func test01() {
 
 func testUM01() {
 
-	fmt.Println("unmarshal")
+	fmt.Println("unmarshal string buffer")
 
 	var dat2 []Admin
 
