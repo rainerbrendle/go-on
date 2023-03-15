@@ -5,13 +5,13 @@ import (
 	"fmt"
 )
 
-type Admin struct {
+type Admin2 struct {
 	ID         int    `json:"id"`
 	ShardID    string `json:"shardID"`
 	VersionID  string `json:"versionID"`
 	ValidFrom  string `json:"validFrom"`
 	OrgName    string `json:"orgName"`
-	DbTypeNAme string `json:"dbTypeName"`
+	DbTypeName string `json:"dbTypeName"`
 	Replica    int    `json:"replica"`
 }
 
@@ -26,7 +26,7 @@ type Request struct {
 
 type AdminRequest struct {
 	Request Request `json:"request"`
-	Admin   Admin   `json:"admin"`
+	Admin   Admin2  `json:"admin"`
 }
 
 type Record struct {
@@ -40,7 +40,7 @@ type Record struct {
 
 type AdminRecord struct {
 	Record Record `json:"record"`
-	Admin  Admin  `json:"admin"`
+	Admin  Admin2 `json:"admin"`
 }
 
 type A1 struct {
@@ -62,6 +62,36 @@ var a1dat []AdminRequest
 var a2dat []AdminRecord
 
 func TestInit() {
+
+	a1dat = make([]AdminRequest, 2)
+	m := Request{
+		ReceiverID: "0",
+		ActorID:    "YellowPages",
+		SequenceID: 1,
+		Epoche:     0,
+		ActionID:   "create",
+		SenderID:   "client1"}
+	a1 := Admin2{
+		ID:         1,
+		ShardID:    "Control",
+		VersionID:  "1.1.0.1",
+		ValidFrom:  "2023-03-01",
+		OrgName:    "IT",
+		DbTypeName: "postgres",
+		Replica:    3}
+
+	var a1buffer AdminRequest
+
+	a1buffer.Request = m
+	a1buffer.Admin = a1
+	a1dat[0] = a1buffer
+
+	m.SequenceID = 2
+	m.ActionID = "modify"
+	a1.ID = 2
+	a1buffer.Admin = a1
+	a1buffer.Request = m
+	a1dat[1] = a1buffer
 
 }
 
@@ -89,6 +119,15 @@ func TestM01() {
 	}
 
 	fmt.Printf(" testM01: length %v %v\n", len(dat1), dat1)
+
+	fmt.Printf(" testM01: %v\n", string(jsonBlob))
+
+	jsonBlob, err = json.Marshal(a1dat)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Printf(" testM01: length %v %v\n", len(a1dat), a1dat)
 
 	fmt.Printf(" testM01: %v\n", string(jsonBlob))
 
