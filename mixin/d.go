@@ -39,6 +39,8 @@ func ActivateDB() {
 
 func DBConnect() {
 
+	fmt.Printf("database open connection\n %v\n", conf.dbInfo)
+
 	db, err := sql.Open("postgres", conf.dbInfo)
 	if err != nil {
 		fmt.Println(err)
@@ -46,6 +48,7 @@ func DBConnect() {
 	}
 	defer DBClose()
 
+	fmt.Println(" ping ....")
 	err = db.Ping()
 	if err != nil {
 		panic(err)
