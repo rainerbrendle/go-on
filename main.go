@@ -52,9 +52,7 @@ func main() {
 	// new mpdule
 	mixin.TestM01()
 
-	// database connections
-	mixin.ActivateDB()
-	mixin.TestDB()
+	mixin.DbTests()
 
 }
 

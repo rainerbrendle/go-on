@@ -13,60 +13,78 @@ type DbConfig struct {
 	active bool
 }
 
-// var conf DbConfig( active: false )
-var conf DbConfig
-var db *sql.DB
+type DbSession struct {
+	conf DbConfig
+	db   *sql.DB
+}
 
-func TestDB() {
+var session DbSession
 
-	fmt.Printf("  database test %v\n", conf.active)
-	if conf.active == false {
+func DbTests() {
+
+	defer DBClose(&session)
+
+	TestDB(&session)
+	ActivateDB(&session)
+	// ...
+}
+
+func TestDB(s *DbSession) {
+
+	fmt.Printf("  database test %v\n", s.conf.active)
+	if s.conf.active == false {
 		return
 	}
 
 }
 
-func ActivateDB() {
+func ActivateDB(s *DbSession) {
 
-	conf.active = false
-	conf.dbInfo = DbInfo()
+	s.conf.active = false
+	s.conf.dbInfo = DbInfo()
 
-	DBConnect()
+	DBConnect(s)
 
-	fmt.Printf("  database info %v\n", conf.dbInfo)
+	fmt.Printf("  database info after connect \n...: %v tested %v\n", s.conf.dbInfo, s.conf.tested)
 
 }
 
-func DBConnect() {
+func DBConnect(s *DbSession) {
 
-	fmt.Printf("database open connection\n %v\n", conf.dbInfo)
+	fmt.Printf("database open connection\n ...:%v\n", s.conf.dbInfo)
 
-	db, err := sql.Open("postgres", conf.dbInfo)
+	db, err := sql.Open("postgres", s.conf.dbInfo)
 	if err != nil {
 		fmt.Println(err)
 		panic(err)
 	}
-	defer DBClose()
+	s.db = db
 
 	fmt.Println(" ping ....")
-	err = db.Ping()
+	err = s.db.Ping()
 	if err != nil {
 		panic(err)
 	}
 
 	fmt.Println("Successfully connected!")
 
-	conf.active = true
-	conf.tested = true
+	s.conf.active = true
+	s.conf.tested = true
 }
 
-func DBClose() {
+func DBClose(s *DbSession) {
 
-	if db != nil {
-		db.Close()
+	if s == nil {
+		return
 	}
 
-	conf.tested = false
-	conf.active = false
+	fmt.Println(" ... closing")
+
+	if s.db != nil {
+		s.db.Close()
+	}
+
+	s.conf.tested = false
+	s.conf.active = false
 
 }
