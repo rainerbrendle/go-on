@@ -53,7 +53,8 @@ func main() {
 	mixin.TestM01()
 
 	// database connections
-        mixin.TestDB()	
+	mixin.ActivateDB()
+	mixin.TestDB()
 
 }
 
