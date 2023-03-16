@@ -120,18 +120,18 @@ func TestM01() {
 		fmt.Println(err)
 	}
 
-	fmt.Printf(" testM01: length %v %v\n", len(dat1), dat1)
+	fmt.Printf(" testM01: length %v\n %v\n", len(dat1), dat1)
 
-	fmt.Printf(" testM01: %v\n", string(jsonBlob))
+	fmt.Printf(" testM01:\n more%v\n", string(jsonBlob))
 
 	jsonBlob, err = json.Marshal(a1dat)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	fmt.Printf(" testM01: length %v %v\n", len(a1dat), a1dat)
+	fmt.Printf(" testM01: length %v\n %v\n", len(a1dat), a1dat)
 
-	fmt.Printf(" testM01: %v\n", string(jsonBlob))
+	fmt.Printf(" testM01:\n %v\n", string(jsonBlob))
 
 }
 

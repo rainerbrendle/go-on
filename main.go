@@ -137,7 +137,7 @@ func test01() {
 			"postgres",
 			3}}
 
-	fmt.Println("marshal more ...")
+	fmt.Println("marshal  Admin data structure for YellowPages ...")
 
 	jsonBlob2, err := json.Marshal(dat)
 
@@ -146,11 +146,11 @@ func test01() {
 		panic("marshal")
 	}
 
-	fmt.Printf("input: \n GO table %v\n", dat)
+	fmt.Printf("input: \n GO Admin table\n %v\n", dat)
 
 	s := string(jsonBlob2)
 
-	fmt.Printf("output: \n JSON byte array %v\n", s)
+	fmt.Printf("output: \n JSON byte array\n %v\n", s)
 
 	// remove white space from JSON
 	// we need a bytes.Buffer as intermediate buffer
@@ -159,14 +159,14 @@ func test01() {
 		fmt.Println(err)
 	}
 
-	fmt.Printf("Without white space:\n check %v\n", stringBuffer.String())
+	fmt.Printf(" byte array without white space:\n check byte array\n %v\n", stringBuffer.String())
 
 	// hash code
 	var str string
 	str = stringBuffer.String() + prefixCode // seed
 
 	hash := sha256.Sum256([]byte(str))
-	fmt.Printf("Hash for %v:\n %x\n", s, hash)
+	fmt.Printf("SHA256 Hash code with Prefix for\n %v:\n %x\n", s, hash)
 	testHash = hash
 
 	// map to a generic slice (array)
