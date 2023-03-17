@@ -22,6 +22,9 @@ var session DbSession
 
 func DbTests() {
 
+	fmt.Printf("Database related testing ...\n")
+
+	// close database connection when function returns
 	defer DBClose(&session)
 
 	TestDB(&session)
@@ -45,13 +48,13 @@ func ActivateDB(s *DbSession) {
 
 	DBConnect(s)
 
-	fmt.Printf("  database info after connect \n...: %v tested %v\n", s.conf.dbInfo, s.conf.tested)
+	fmt.Printf("  database: info after connect \n...: %v ping tested %v\n", s.conf.dbInfo, s.conf.tested)
 
 }
 
 func DBConnect(s *DbSession) {
 
-	fmt.Printf("database open connection\n ...:%v\n", s.conf.dbInfo)
+	fmt.Printf("database: open connection\n ...: %v\n", s.conf.dbInfo)
 
 	db, err := sql.Open("postgres", s.conf.dbInfo)
 	if err != nil {
