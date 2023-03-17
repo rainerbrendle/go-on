@@ -19,7 +19,7 @@ type Request struct {
 	ReceiverID string `json:"receiverID"`
 	ActorID    string `json:"actorID"`
 	SequenceID int    `json:"sequenceID"`
-	Epoche     int    `json:"epoche"`
+	Epoch      int    `json:"epoche"`
 	ActionID   string `json:"actionID"`
 	SenderID   string `json:"senderID"`
 }
@@ -33,9 +33,12 @@ type Record struct {
 	ReceiverID string `json:"receiverID"`
 	ActorID    string `json:"actorID"`
 	SequenceID int    `json:"sequenceID"`
-	Epoche     int    `json:"epoche"`
+	Epoch      int    `json:"epoch"`
 	ActionID   string `json:"actionID"`
 	SenderID   string `json:"senderID"`
+        Reason     string `json:"reason"`
+        DateTime   string `json:"dateTime"`
+        Signature  string `json:"signature"`
 }
 
 type AdminRecord struct {
@@ -68,7 +71,7 @@ func TestInit() {
 		ReceiverID: "0",
 		ActorID:    "YellowPages",
 		SequenceID: 1,
-		Epoche:     0,
+		Epoch:      0,
 		ActionID:   "create",
 		SenderID:   "client1"}
 	a1 := Admin2{
