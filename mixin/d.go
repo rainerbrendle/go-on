@@ -29,7 +29,34 @@ func DbTests() {
 
 	TestDB(&session)
 	ActivateDB(&session)
-	// ...
+	NotifyDB(&session)
+	AgentLoopDB(&session)
+	ReadFromDB(&session)
+
+}
+
+func NotifyDB(s *DbSession) {
+	fmt.Printf("  try notify %v\n", s.conf.active)
+	if s.conf.active == false {
+		return
+	}
+
+}
+
+func AgentLoopDB(s *DbSession) {
+	fmt.Printf("  agent .. %v\n", s.conf.active)
+	if s.conf.active == false {
+		return
+	}
+
+}
+
+func ReadFromDB(s *DbSession) {
+	fmt.Printf("  reading .. %v\n", s.conf.active)
+	if s.conf.active == false {
+		return
+	}
+
 }
 
 func TestDB(s *DbSession) {
