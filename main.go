@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"go-on.com/mixin"
+	"go-on.com/server"
 )
 
 // global conversion buffer for testing
@@ -53,6 +54,8 @@ func main() {
 	mixin.TestM01()
 
 	mixin.DbTests()
+
+	server.Run()
 
 }
 
