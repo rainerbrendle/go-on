@@ -44,8 +44,9 @@ func CreateTestData(s *DbSession) {
 
 	// DROP TEST DATA
 	dropTestData(s)
+	createTestData(s)
 
-	// INSERT TEST DATA
+	// INSERTED TEST DATA
 }
 
 func dropTestData(s *DbSession) {
@@ -54,16 +55,28 @@ func dropTestData(s *DbSession) {
 
 	fmt.Printf("  DropTestData 1: statement %v\n", statement)
 
-	_, err := s.db.Exec(statement)
+	result, err := s.db.Exec(statement)
 
 	if err != nil {
 		panic(err)
 	}
 
+	var dest string
+	var seq int
+
 	statement = `CALL PR2.Echo( $1, $2, $3, $4);`
 	fmt.Printf("  DropTestData 2: statement %v\n", statement)
 
-	_, err = s.db.Exec(statement)
+	err = s.db.QueryRow(statement, "XXX", 100, nil, nil).Scan(&dest, &seq)
+	fmt.Printf("  Echo: %v : %v \n", dest, seq)
+
+	if err != nil {
+		panic(err)
+	}
+
+	statement = `DELETE FROM PR2.SenderJournal WHERE SenderID = $1;`
+	result, err = s.db.Exec(statement, "TEST")
+	fmt.Printf("  DropTestData 3: statement %v result %v\n", statement, result)
 
 	if err != nil {
 		panic(err)
@@ -71,6 +84,15 @@ func dropTestData(s *DbSession) {
 
 	return
 
+}
+
+func createTestData(s *DbSession) {
+	fmt.Printf("  Creating test data\n")
+
+	for i := 0; i < 2; i++ {
+		fmt.Printf("  %v: \n", i)
+
+	}
 }
 
 func NotifyDB(s *DbSession) {
