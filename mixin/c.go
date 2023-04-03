@@ -9,8 +9,8 @@ import (
 
 const host = "localhost"
 const port = 5432
-const user = "test"
-const password = "test"
+const user = "postgres"
+const password = "postgres"
 const dbname = "test"
 
 func DbInfo() string {

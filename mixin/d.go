@@ -28,15 +28,53 @@ func DbTests() {
 	defer DBClose(&session)
 
 	TestDB(&session)
+
 	ActivateDB(&session)
+
+	CreateTestData(&session)
+
 	NotifyDB(&session)
 	AgentLoopDB(&session)
 	ReadFromDB(&session)
 
 }
 
+func CreateTestData(s *DbSession) {
+	fmt.Printf("  CreateTestData: create test data .. running %v\n", s.conf.tested)
+
+	// DROP TEST DATA
+	dropTestData(s)
+
+	// INSERT TEST DATA
+}
+
+func dropTestData(s *DbSession) {
+	//  statement := `DROP TABLE PR2.SenderJournal;`
+	statement := `SELECT PR2.DoNothing();`
+
+	fmt.Printf("  DropTestData 1: statement %v\n", statement)
+
+	_, err := s.db.Exec(statement)
+
+	if err != nil {
+		panic(err)
+	}
+
+	statement = `CALL PR2.Echo( $1, $2, $3, $4);`
+	fmt.Printf("  DropTestData 2: statement %v\n", statement)
+
+	_, err = s.db.Exec(statement)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return
+
+}
+
 func NotifyDB(s *DbSession) {
-	fmt.Printf("  try notify %v\n", s.conf.active)
+	fmt.Printf("  NotifyDB: try notify %v\n", s.conf.active)
 	if s.conf.active == false {
 		return
 	}
@@ -44,7 +82,7 @@ func NotifyDB(s *DbSession) {
 }
 
 func AgentLoopDB(s *DbSession) {
-	fmt.Printf("  agent .. %v\n", s.conf.active)
+	fmt.Printf("  AgentLoopDB: agent .. %v\n", s.conf.active)
 	if s.conf.active == false {
 		return
 	}
@@ -52,7 +90,7 @@ func AgentLoopDB(s *DbSession) {
 }
 
 func ReadFromDB(s *DbSession) {
-	fmt.Printf("  reading .. %v\n", s.conf.active)
+	fmt.Printf("  ReadFromDB: reading .. %v\n", s.conf.active)
 	if s.conf.active == false {
 		return
 	}
@@ -61,7 +99,7 @@ func ReadFromDB(s *DbSession) {
 
 func TestDB(s *DbSession) {
 
-	fmt.Printf("  database test %v\n", s.conf.active)
+	fmt.Printf("  TestDB: database test %v\n", s.conf.active)
 	if s.conf.active == false {
 		return
 	}
@@ -75,7 +113,7 @@ func ActivateDB(s *DbSession) {
 
 	DBConnect(s)
 
-	fmt.Printf("  database: info after connect \n...: %v ping tested %v\n", s.conf.dbInfo, s.conf.tested)
+	fmt.Printf("  AcivateDB: database: info after connect \n...: %v ping tested %v\n", s.conf.dbInfo, s.conf.tested)
 
 }
 

@@ -6,6 +6,7 @@
 
 DROP SCHEMA PR2 CASCADE;
 CREATE SCHEMA PR2;
+GRANT ALL PRIVILEGES ON ALL TABLES in SCHEMA PR2 to test;
 
 
 CREATE TABLE IF NOT EXISTS PR2.ReceiverJournal (
@@ -59,6 +60,35 @@ CREATE TABLE IF NOT EXISTS PR2.ReceiverJournal (
    UNIQUE(ActorID, SenderID, SequenceID, Epoch )
  );
 
+CREATE OR REPLACE FUNCTION PR2.DoNothing() RETURNS void
+AS $$
+BEGIN
+   NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+/* 
+ * not too extermely helpful procedure to test input and output parameters
+ * 
+ * You can CALL by PR2.Echo( 'sender', sequence, NULL, NULL)
+ */
+CREATE OR REPLACE PROCEDURE PR2.Echo( IN _sender text, IN _seq BIGINT, OUT _s text, OUT _sq BIGINT)
+LANGUAGE plpgsql
+AS $$
+  DECLARE 
+  BEGIN
+
+    _s = _sender;
+    _sq = _seq;
+
+    COMMIT;
+    RETURN;
+  EXCEPTION
+     WHEN OTHERS THEN
+        ROLLBACK;
+  END;
+$$;
+
 
  CREATE  OR REPLACE  FUNCTION PR2.GetHWM(_sender text)
     RETURNS BIGINT  as $$
@@ -80,6 +110,20 @@ CREATE TABLE IF NOT EXISTS PR2.ReceiverJournal (
     END;
 
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE PROCEDURE PR2.InsertJournal( IN _sender text, IN _seq BIGINT)
+LANGUAGE plpgsql
+AS $$
+  DECLARE
+  BEGIN
+
+    COMMIT;
+    RETURN;
+  EXCEPTION
+     WHEN OTHERS THEN
+        ROLLBACK;
+  END;
+$$;
 
 
 
