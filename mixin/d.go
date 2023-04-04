@@ -3,7 +3,7 @@ package mixin
 import (
 	"database/sql"
 	"fmt"
-
+    "time"
 	_ "github.com/lib/pq"
 )
 
@@ -16,6 +16,16 @@ type DbConfig struct {
 type DbSession struct {
 	conf DbConfig
 	db   *sql.DB
+}
+
+type testRecord struct {
+	actor     string 
+	receiver  string
+    reason    string 
+	dateTime  string 
+	action    string
+	json      string
+	signature string
 }
 
 var session DbSession
@@ -53,7 +63,7 @@ func dropTestData(s *DbSession) {
 	//  statement := `DROP TABLE PR2.SenderJournal;`
 	statement := `SELECT PR2.DoNothing();`
 
-	fmt.Printf("  DropTestData 1: statement %v\n", statement)
+	fmt.Printf("  DropTestData 1: SELECT FUNCTION: statement %v\n", statement)
 
 	result, err := s.db.Exec(statement)
 
@@ -65,10 +75,10 @@ func dropTestData(s *DbSession) {
 	var seq int
 
 	statement = `CALL PR2.Echo( $1, $2, $3, $4);`
-	fmt.Printf("  DropTestData 2: statement %v\n", statement)
+	fmt.Printf("  DropTestData 2: CALL PROCEDURE: statement %v\n", statement)
 
 	err = s.db.QueryRow(statement, "XXX", 100, nil, nil).Scan(&dest, &seq)
-	fmt.Printf("  Echo: %v : %v \n", dest, seq)
+	fmt.Printf("  Echo: XXX/100 =? %v/%v \n", dest, seq)
 
 	if err != nil {
 		panic(err)
@@ -76,7 +86,7 @@ func dropTestData(s *DbSession) {
 
 	statement = `DELETE FROM PR2.SenderJournal WHERE SenderID = $1;`
 	result, err = s.db.Exec(statement, "TEST")
-	fmt.Printf("  DropTestData 3: statement %v result %v\n", statement, result)
+	fmt.Printf("  DropTestData 3: statement %v result %T\n", statement, result )
 
 	if err != nil {
 		panic(err)
@@ -86,13 +96,46 @@ func dropTestData(s *DbSession) {
 
 }
 
+
 func createTestData(s *DbSession) {
 	fmt.Printf("  Creating test data\n")
+
+	var record testRecord
+
+	record.actor    = "admin"
+	record.receiver = "IT"
+	record.reason   = "0"
+	record.dateTime = time.Now().String()
+	record.action   = "create"
+	record.json     = ""
 
 	for i := 0; i < 2; i++ {
 		fmt.Printf("  %v: \n", i)
 
+		sign( &record )
+		insertTestRecord( s, &record )
 	}
+}
+
+func sign( record *testRecord) {
+	/* sign record */
+	record.signature = ""
+}
+
+func insertTestRecord( s *DbSession, record *testRecord ) {
+	statement := `CALL PR2.TestData( $1, $2, $3, $4, $5, $6, $7);`
+
+/*	CREATE OR REPLACE PROCEDURE PR2.TestData(IN _actor text, 
+		IN _receiver text,
+		IN _reason text,
+		IN _dateTime text,
+		IN _action text,
+		IN _json text,
+		IN _signature text
+	   )
+ */
+	fmt.Printf("  TestData: CALL PROCEDURE: statement %v\n", statement)
+
 }
 
 func NotifyDB(s *DbSession) {

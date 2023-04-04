@@ -89,6 +89,37 @@ AS $$
   END;
 $$;
 
+CREATE OR REPLACE PROCEDURE PR2.TestData(IN _actor text, 
+                                         IN _receiver text,
+                                         IN _reason text,
+                                         IN _dateTime text,
+                                         IN _action text,
+                                         IN _json text,
+                                         IN _signature text
+                                        )
+LANGUAGE plpgsql
+AS $$
+  DECLARE
+     _sender text = "TEST";
+     _epoch  text = "0";
+     _majorVersion BigInt = 1;
+     _minorVersion BigInt = 0;
+  BEGIN
+
+     INSERT INTO PR2.SenderJournal 
+       ( ActorID, ReceiverID, SenderID, Reason, DateTime, Epoch, ActionID, jData,
+         MajorProtocolVersion, MinorProtocolVersion, Signature)
+       VALUES
+       ( _actor, _receiver, _sender, _reason, _datetime, _epoch, _action, _json, 
+         _majorVersion, _minorVersion );
+
+     COMMIT;
+     EXCEPTION
+       WHEN OTHERS THEN
+         ROLLBACK;
+  END;
+$$;
+
 
  CREATE  OR REPLACE  FUNCTION PR2.GetHWM(_sender text)
     RETURNS BIGINT  as $$
