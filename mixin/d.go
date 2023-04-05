@@ -147,7 +147,7 @@ func insertTestRecord( s *DbSession, record *testRecord ) {
 	converted := fmt.Sprintf( "%x", record.signature )
     fmt.Printf("  signature: %v\n", converted)
 
-	result, err := s.db.Exec(statement, 
+	_, err := s.db.Exec(statement, 
 		                     record.actor, record.receiver, record.reason, record.dateTime,
 							 record.action, record.json, converted )
 
@@ -167,12 +167,14 @@ func insertTestRecord( s *DbSession, record *testRecord ) {
 		IN _signature text
 	   )
  */
-    rowsAffected, err  := result.RowsAffected()
+
+ /* (not supported by pg driver)
+   lastId, err  := result.LastInsertId()
     if err != nil {
 	   panic(err)
     }
- 
-	fmt.Printf("  TestData: CALL PROCEDURE: statement %v rows %v\n", statement, rowsAffected )
+*/ 
+	fmt.Printf("  TestData: CALL PROCEDURE: statement %v\n", statement )
 
 }
 
