@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
     "time"
+	"crypto/sha256"
 	_ "github.com/lib/pq"
 )
 
@@ -16,16 +17,18 @@ type DbConfig struct {
 type DbSession struct {
 	conf DbConfig
 	db   *sql.DB
+	prefixCode string
 }
 
 type testRecord struct {
-	actor     string 
-	receiver  string
-    reason    string 
-	dateTime  string 
-	action    string
-	json      string
-	signature string
+	actor      string 
+	receiver   string
+    reason     string 
+	dateTime   string 
+	action     string
+	json       string
+	prefixCode string
+	signature  [32]byte
 }
 
 var session DbSession
@@ -101,29 +104,59 @@ func createTestData(s *DbSession) {
 	fmt.Printf("  Creating test data\n")
 
 	var record testRecord
+    tm := time.Now()
 
-	record.actor    = "admin"
-	record.receiver = "IT"
-	record.reason   = "0"
-	record.dateTime = time.Now().String()
-	record.action   = "create"
-	record.json     = ""
+	tmd:= tm.Format(time.RFC3339)
+
+	record.actor      = "admin"
+	record.receiver   = "IT"
+	record.reason     = "0"
+	record.dateTime   =  tmd
+	record.action     = "create"
+	record.json       = `[{"id":101}]`
+	record.prefixCode = s.prefixCode
+
+	fmt.Printf("%v\n", time.Now().Format(time.RFC3339))
 
 	for i := 0; i < 2; i++ {
-		fmt.Printf("  %v: \n", i)
+		fmt.Printf("  %v: %v %v\n", i, record.dateTime, record.prefixCode)
 
 		sign( &record )
 		insertTestRecord( s, &record )
 	}
+
+	fmt.Printf("%v\n", time.Now().Format(time.RFC3339))
+
 }
 
 func sign( record *testRecord) {
+	var str string
+
+	str = record.json + record.dateTime + record.prefixCode // seed
+
+	hash := sha256.Sum256([]byte(str))
+	fmt.Printf("SHA256 Hash code with Prefix for\n %v:\n %x\n", str, hash)
+	
 	/* sign record */
-	record.signature = ""
+	record.signature = hash
 }
 
 func insertTestRecord( s *DbSession, record *testRecord ) {
 	statement := `CALL PR2.TestData( $1, $2, $3, $4, $5, $6, $7);`
+
+	converted := fmt.Sprintf( "%x", record.signature )
+    fmt.Printf("  signature: %v\n", converted)
+
+	result, err := s.db.Exec(statement, 
+		                     record.actor, record.receiver, record.reason, record.dateTime,
+							 record.action, record.json, converted )
+
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("   %v %v \n    %v %v\n     %v %v\n    %v\n", record.actor, record.receiver,
+                record.reason, record.dateTime, record.action, record.json, converted)
 
 /*	CREATE OR REPLACE PROCEDURE PR2.TestData(IN _actor text, 
 		IN _receiver text,
@@ -134,7 +167,12 @@ func insertTestRecord( s *DbSession, record *testRecord ) {
 		IN _signature text
 	   )
  */
-	fmt.Printf("  TestData: CALL PROCEDURE: statement %v\n", statement)
+    rowsAffected, err  := result.RowsAffected()
+    if err != nil {
+	   panic(err)
+    }
+ 
+	fmt.Printf("  TestData: CALL PROCEDURE: statement %v rows %v\n", statement, rowsAffected )
 
 }
 
@@ -203,6 +241,7 @@ func DBConnect(s *DbSession) {
 
 	s.conf.active = true
 	s.conf.tested = true
+	s.prefixCode  = "SE3D"
 }
 
 func DBClose(s *DbSession) {

@@ -100,23 +100,24 @@ CREATE OR REPLACE PROCEDURE PR2.TestData(IN _actor text,
 LANGUAGE plpgsql
 AS $$
   DECLARE
-     _sender text = "TEST";
-     _epoch  text = "0";
+     _sender text = 'TEST';
+     _epoch  text = '0';
      _majorVersion BigInt = 1;
      _minorVersion BigInt = 0;
   BEGIN
 
      INSERT INTO PR2.SenderJournal 
-       ( ActorID, ReceiverID, SenderID, Reason, DateTime, Epoch, ActionID, jData,
+       ( ActorID, ReceiverID, SenderID, Reason, DateTime, Epoch, ActionID, cData,
          MajorProtocolVersion, MinorProtocolVersion, Signature)
        VALUES
        ( _actor, _receiver, _sender, _reason, _datetime, _epoch, _action, _json, 
-         _majorVersion, _minorVersion );
+         _majorVersion, _minorVersion, _signature);
 
      COMMIT;
-     EXCEPTION
-       WHEN OTHERS THEN
+     /* EXCEPTION
+          WHEN OTHERS THEN
          ROLLBACK;
+     */
   END;
 $$;
 
