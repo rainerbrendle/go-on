@@ -5,6 +5,8 @@ import (
 	"fmt"
 )
 
+const PrefixCode string = "BR227"
+
 type Admin2 struct {
 	ID         int    `json:"id"`
 	ShardID    string `json:"shardID"`
@@ -36,9 +38,9 @@ type Record struct {
 	Epoch      int    `json:"epoch"`
 	ActionID   string `json:"actionID"`
 	SenderID   string `json:"senderID"`
-        Reason     string `json:"reason"`
-        DateTime   string `json:"dateTime"`
-        Signature  string `json:"signature"`
+	Reason     string `json:"reason"`
+	DateTime   string `json:"dateTime"`
+	Signature  string `json:"signature"`
 }
 
 type AdminRecord struct {

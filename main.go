@@ -50,7 +50,7 @@ func main() {
 	// Initialize Mixin
 	mixin.TestInit()
 
-	// new mpdule
+	// new module
 	mixin.TestM01()
 
 	mixin.DbTests()
